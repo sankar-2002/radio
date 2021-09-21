@@ -20,6 +20,18 @@ class _HomePageState extends State<HomePage> {
   Color _selectedColor;
   bool _isPlaying = false;
 
+  final sugg = [
+    "Play",
+    "Stop",
+    "Play rock music",
+    "Play 107 FM",
+    "Play next",
+    "Play 104 FM",
+    "Pause",
+    "Play previous",
+    "Play Pop music"
+  ];
+
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
@@ -125,7 +137,35 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(),
+      drawer: Drawer(
+        child: Container(
+          color: _selectedColor ?? AIColors.primaryColor2,
+          child: radios != null
+              ? [
+                  100.heightBox,
+                  "All Channels".text.xl.white.semiBold.make().px16(),
+                  20.heightBox,
+                  ListView(
+                    padding: Vx.m0,
+                    shrinkWrap: true,
+                    children: radios
+                        .map(
+                          (e) => ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(e.icon),
+                            ),
+                            title: "${e.name} FM".text.white.make(),
+                            subtitle: e.tagline.text.white.make(),
+                          ),
+                        )
+                        .toList(),
+                  ).expand()
+                ].vStack(
+                  crossAlignment: CrossAxisAlignment.start,
+                )
+              : const Offstage(),
+        ),
+      ),
       body: Stack(
         children: [
           VxAnimatedBox()
@@ -141,15 +181,36 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
               .make(),
-          AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-            centerTitle: true,
-            title: 'AI Radio'.text.xl4.bold.white.make().shimmer(
-                  primaryColor: Vx.purple300,
-                  secondaryColor: Colors.white,
-                ),
-          ).h(100.0).p16(),
+          [
+            AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0.0,
+              centerTitle: true,
+              title: 'AI Radio'.text.xl4.bold.white.make().shimmer(
+                    primaryColor: Vx.purple300,
+                    secondaryColor: Colors.white,
+                  ),
+            ).h(100.0).p16(),
+            "Start with - Hey Alan 👇".text.italic.semiBold.white.make(),
+            10.heightBox,
+            VxSwiper.builder(
+              itemCount: sugg.length,
+              height: 50.0,
+              viewportFraction: 0.35,
+              autoPlay: true,
+              autoPlayAnimationDuration: 3.seconds,
+              autoPlayCurve: Curves.linear,
+              enableInfiniteScroll: true,
+              itemBuilder: (context, index) {
+                final s = sugg[index];
+                return Chip(
+                  label: s.text.make(),
+                  backgroundColor: Vx.randomColor,
+                );
+              },
+            )
+          ].vStack(),
+          30.heightBox,
           radios != null
               ? VxSwiper.builder(
                   itemCount: radios.length,
