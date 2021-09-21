@@ -1,5 +1,6 @@
 // ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, avoid_print, prefer_const_literals_to_create_immutables
 
+import 'package:alan_voice/alan_voice.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<MyRadio> radios;
   MyRadio _selectedRadio;
-  // Color _selectedColor;
+  Color _selectedColor;
   bool _isPlaying = false;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    setupAlan();
     fetchRadios();
 
     _audioPlayer.onPlayerStateChanged.listen((event) {
@@ -35,6 +37,12 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {});
     });
+  }
+
+  setupAlan() {
+    AlanVoice.addButton(
+        "d63876faa334858a2f570894f57d67b32e956eca572e1d8b807a3e2338fdd0dc/stage",
+        buttonAlign: AlanVoice.BUTTON_ALIGN_RIGHT);
   }
 
   fetchRadios() async {
@@ -49,7 +57,6 @@ class _HomePageState extends State<HomePage> {
     _audioPlayer.play(url);
 
     _selectedRadio = radios.firstWhere((element) => element.url == url);
-    print(_selectedRadio.name);
 
     setState(() {});
   }
@@ -65,8 +72,8 @@ class _HomePageState extends State<HomePage> {
               .withGradient(
                 LinearGradient(
                   colors: [
-                    AIColors.primaryColor1,
                     AIColors.primaryColor2,
+                    _selectedColor ?? AIColors.primaryColor1,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -86,6 +93,14 @@ class _HomePageState extends State<HomePage> {
               ? VxSwiper.builder(
                   itemCount: radios.length,
                   aspectRatio: 1.0,
+                  onPageChanged: (index) {
+                    final colorHex = radios[index].color;
+                    _selectedColor = Color(
+                      int.tryParse(colorHex),
+                    );
+
+                    setState(() {});
+                  },
                   itemBuilder: (context, index) {
                     final rad = radios[index];
 
